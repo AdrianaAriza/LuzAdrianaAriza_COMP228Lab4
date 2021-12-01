@@ -63,6 +63,7 @@ public class GamerController {
                 + "'" + postalCode.getText() + "', "
                 + "'" + province.getText() + "')";
         System.out.println(query);
+        statement.executeQuery(query);
         statement.close();
         con.close();
     }
@@ -76,6 +77,7 @@ public class GamerController {
                 + "'" + gameId.getText() + "', "
                 + "'" + gameTitle.getText() + "')";
         System.out.println(query);
+        statement.executeQuery(query);
         statement.close();
         con.close();
     }
@@ -94,6 +96,7 @@ public class GamerController {
                 + "'" + playingDate.getValue() + "', "
                 + "'" + score.getText() + "')";
         System.out.println(query);
+        statement.executeQuery(query);
         statement.close();
         con.close();
     }
