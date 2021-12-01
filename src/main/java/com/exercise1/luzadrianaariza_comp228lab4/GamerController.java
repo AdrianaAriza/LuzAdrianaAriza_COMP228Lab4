@@ -18,9 +18,12 @@ import oracle.jdbc.driver.OracleDriver;
 
 public class GamerController {
 
-    public static final String DBURL = "jdbc:oracle:thin:@localhost:1521:ORCLCDB";
-    public static final String DBUSER = "adriana";
-    public static final String DBPASS = "adriana";
+//    public static final String DBURL = "jdbc:oracle:thin:@localhost:1521:ORCLCDB";
+//    public static final String DBUSER = "adriana";
+//    public static final String DBPASS = "adriana";
+    public static final String DBURL = "jdbc:oracle:thin:@localhost:1522:oracle";
+    public static final String DBUSER = "imoskgn";
+    public static final String DBPASS = "imoskgn";
 
     @FXML
     private TextField playerId;
@@ -47,21 +50,10 @@ public class GamerController {
     @FXML
     private ComboBox<String> playerList;
 
+
     @FXML
     private void initialize() throws SQLException {
-        DriverManager.registerDriver(new OracleDriver());
-        Connection con = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
-        List<String> players = new ArrayList<String>();
-        String query = "SELECT PLAYER_ID FROM PLAYER";
-        PreparedStatement ps = con.prepareStatement(query);
-        ResultSet rs = ps.executeQuery();
-        System.out.println(rs);
-        while(rs.next()) {
-            System.out.println("PlayerId: "+rs.getString("PLAYER_ID")+", ");
-            players.add(rs.getString("PLAYER_ID"));
-        }
-        ObservableList<String> listOfPlayers = FXCollections.observableArrayList(players);
-        playerList.setItems(listOfPlayers);
+        loadPlayerList();
     }
 
     public void createRegister() throws SQLException {
@@ -69,7 +61,27 @@ public class GamerController {
         createPlayer();
         createGame();
         createPlayerAndGame();
+        loadPlayerList();
         clearFields();
+    }
+
+    public void loadPlayerList() throws SQLException {
+        DriverManager.registerDriver(new OracleDriver());
+        Connection con = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
+        List<String> players = new ArrayList<String>();
+        String query = "SELECT PLAYER_ID FROM PLAYER";
+        PreparedStatement ps = con.prepareStatement(query);
+        ResultSet rs = ps.executeQuery();
+        while(rs.next()) {
+//            System.out.println("PlayerId: "+rs.getString("PLAYER_ID")+", ");
+            players.add(rs.getString("PLAYER_ID"));
+        }
+        System.out.println(players.size());
+        if(players.size() > 0){
+            ObservableList<String> listOfPlayers = FXCollections.observableArrayList(players);
+            playerList.setItems(listOfPlayers);
+        }
+
     }
 
     public void createPlayer() throws SQLException {
