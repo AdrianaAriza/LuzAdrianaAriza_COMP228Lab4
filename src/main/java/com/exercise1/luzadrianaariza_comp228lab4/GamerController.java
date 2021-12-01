@@ -149,4 +149,23 @@ public class GamerController {
         playingDate.setValue(LocalDate.now());
         score.setText("");
     }
+    public void displayAction() throws SQLException {
+        if(playerList.getSelectionModel().getSelectedItem()!=null){
+            DriverManager.registerDriver(new OracleDriver());
+            Connection con = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
+            String query = "SELECT * FROM PLAYER WHERE PLAYER_ID ="+playerList.getSelectionModel().getSelectedItem();
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                playerId.setText(rs.getString("PLAYER_ID"));
+                firstName.setText(rs.getString("FIRST_NAME"));
+                lastName.setText(rs.getString("LAST_NAME"));
+                address.setText(rs.getString("ADDRESS"));
+                postalCode.setText(rs.getString("POSTAL_CODE"));
+                province.setText(rs.getString("PROVINCE"));
+                phoneNumber.setText(rs.getString("PHONE_NUMBER"));
+            }
+        }
+        System.out.println(playerList.getSelectionModel().getSelectedItem());
+    }
 }
