@@ -1,11 +1,16 @@
 package com.exercise1.luzadrianaariza_comp228lab4;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import javafx.scene.control.TextField;
@@ -39,6 +44,25 @@ public class GamerController {
     private DatePicker playingDate;
     @FXML
     private TextField score;
+    @FXML
+    private ComboBox<String> playerList;
+
+    @FXML
+    private void initialize() throws SQLException {
+        DriverManager.registerDriver(new OracleDriver());
+        Connection con = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
+        List<String> players = new ArrayList<String>();
+        String query = "SELECT PLAYER_ID FROM PLAYER";
+        PreparedStatement ps = con.prepareStatement(query);
+        ResultSet rs = ps.executeQuery();
+        System.out.println(rs);
+        while(rs.next()) {
+            System.out.println("PlayerId: "+rs.getString("PLAYER_ID")+", ");
+            players.add(rs.getString("PLAYER_ID"));
+        }
+        ObservableList<String> listOfPlayers = FXCollections.observableArrayList(players);
+        playerList.setItems(listOfPlayers);
+    }
 
     public void createRegister() throws SQLException {
         System.out.println("CREATING USER");
