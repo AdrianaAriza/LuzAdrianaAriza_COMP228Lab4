@@ -13,9 +13,9 @@ import oracle.jdbc.driver.OracleDriver;
 
 public class GamerController {
 
-    public static final String DBURL = "jdbc:oracle:thin:@localhost:1521:ORCLCDB";
-    public static final String DBUSER = "adriana";
-    public static final String DBPASS = "adriana";
+    public static final String DBURL = "jdbc:oracle:thin:@localhost:1521:xe";
+    public static final String DBUSER = "SYSTEM";
+    public static final String DBPASS = "oracle";
 
     @FXML
     private TextField playerId;
@@ -39,6 +39,20 @@ public class GamerController {
     private DatePicker playingDate;
     @FXML
     private TextField score;
+
+    TextField[] textFields = new TextField[] {playerId, firstName, lastName, address, postalCode, province, phoneNumber, gameId, gameTitle, score};
+
+    public void displayPlayerAndGame(String playerId) throws SQLException {
+        DriverManager.registerDriver(new OracleDriver());
+        Connection con = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
+        Statement statement = con.createStatement();
+        String query = "SELECT * FROM PLAYER WHERE player_id = " + playerId +
+                " INNER JOIN PLAYERANDGAME ON PLAYER.player_id = PLAYERANDGAME.player_id" +
+                " INNER JOIN GAME ON PLAYERANDGAME.game_id = GAME.game_id";
+        System.out.println(query);
+        statement.close();
+        con.close();
+    }
 
     public void createRegister() throws SQLException {
         System.out.println("CREATING USER");
@@ -100,17 +114,12 @@ public class GamerController {
         statement.close();
         con.close();
     }
+
     public void clearFields(){
-        playerId.setText("");
-        firstName.setText("");
-        lastName.setText("");
-        phoneNumber.setText("");
-        address.setText("");
-        postalCode.setText("");
-        province.setText("");
-        gameId.setText("");
-        gameTitle.setText("");
-        playingDate.setValue(LocalDate.now());
-        score.setText("");
+        for (int i = 0; i < textFields.length; i++) {
+            TextField txt = (TextField) textFields[i];
+            txt.setText("");
+            playingDate.setValue(LocalDate.now());
+        }
     }
 }
