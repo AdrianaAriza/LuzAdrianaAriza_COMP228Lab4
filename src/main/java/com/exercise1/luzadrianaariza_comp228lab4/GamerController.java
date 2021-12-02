@@ -81,6 +81,7 @@ public class GamerController {
             ObservableList<String> listOfPlayers = FXCollections.observableArrayList(players);
             playerList.setItems(listOfPlayers);
         }
+        con.close();
 
     }
 
@@ -165,7 +166,44 @@ public class GamerController {
                 province.setText(rs.getString("PROVINCE"));
                 phoneNumber.setText(rs.getString("PHONE_NUMBER"));
             }
+            con.close();
         }
         System.out.println(playerList.getSelectionModel().getSelectedItem());
+    }
+
+    public void updatePlayerInfo() throws SQLException {
+        String changes = "";
+        if (firstName.getText() != null && firstName.getText() != ""){
+            changes += "FIRST_NAME = \'"+firstName.getText()+"\',";
+        }
+        if (lastName.getText() != "" && lastName.getText() != ""){
+            changes += "LAST_NAME = \'"+lastName.getText()+"\',";
+        }
+        if (address.getText() != "" && address.getText() != ""){
+            changes += "ADDRESS = \'"+address.getText()+"\',";
+        }
+        if (postalCode.getText() != "" && postalCode.getText() != ""){
+            changes += "POSTAL_CODE = \'"+postalCode.getText()+"\',";
+        }
+        if (province.getText() != "" && province.getText() != ""){
+            changes += "PROVINCE = \'"+province.getText()+"\',";
+        }
+        if (phoneNumber.getText() != "" && phoneNumber.getText() != ""){
+            changes += "PHONE_NUMBER = \'"+phoneNumber.getText()+"\',";
+        }
+
+        if (changes!=""){
+            if (changes.charAt(changes.length() - 1) == ','){
+                changes = changes.substring(0,changes.length() - 1);
+            }
+            System.out.println("fue: \""+phoneNumber.getText()+"\"");
+            String query = "UPDATE PLAYER SET "+ changes +" WHERE PLAYER_ID = "+
+                    playerList.getSelectionModel().getSelectedItem();
+            DriverManager.registerDriver(new OracleDriver());
+            Connection con = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
+            PreparedStatement ps = con.prepareStatement(query);
+            ps.execute();
+            con.close();
+        }
     }
 }
