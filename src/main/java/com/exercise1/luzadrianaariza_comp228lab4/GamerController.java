@@ -3,9 +3,7 @@ package com.exercise1.luzadrianaariza_comp228lab4;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -13,17 +11,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javafx.scene.control.TextField;
 import oracle.jdbc.driver.OracleDriver;
+
+import static java.lang.System.out;
 
 public class GamerController {
 
 //    public static final String DBURL = "jdbc:oracle:thin:@localhost:1521:ORCLCDB";
 //    public static final String DBUSER = "adriana";
 //    public static final String DBPASS = "adriana";
-    public static final String DBURL = "jdbc:oracle:thin:@localhost:1522:oracle";
-    public static final String DBUSER = "imoskgn";
-    public static final String DBPASS = "imoskgn";
+
+//    public static final String DBURL = "jdbc:oracle:thin:@localhost:1522:oracle";
+//    public static final String DBUSER = "imoskgn";
+//    public static final String DBPASS = "imoskgn";
+
+    public static final String DBURL = "jdbc:oracle:thin:@localhost:1521:xe";
+    public static final String DBUSER = "SYSTEM";
+    public static final String DBPASS = "oracle";
 
     @FXML
     private TextField playerId;
@@ -49,7 +53,8 @@ public class GamerController {
     private TextField score;
     @FXML
     private ComboBox<String> playerList;
-
+    @FXML
+    private TextArea output;
 
     @FXML
     private void initialize() throws SQLException {
@@ -57,7 +62,7 @@ public class GamerController {
     }
 
     public void createRegister() throws SQLException {
-        System.out.println("CREATING USER");
+        out.println("CREATING USER");
         createPlayer();
         createGame();
         createPlayerAndGame();
@@ -76,7 +81,7 @@ public class GamerController {
 //            System.out.println("PlayerId: "+rs.getString("PLAYER_ID")+", ");
             players.add(rs.getString("PLAYER_ID"));
         }
-        System.out.println(players.size());
+        out.println(players.size());
         if(players.size() > 0){
             ObservableList<String> listOfPlayers = FXCollections.observableArrayList(players);
             playerList.setItems(listOfPlayers);
@@ -99,7 +104,7 @@ public class GamerController {
                 + "'" + address.getText() + "', "
                 + "'" + postalCode.getText() + "', "
                 + "'" + province.getText() + "')";
-        System.out.println(query);
+        out.println(query);
         statement.executeQuery(query);
         statement.close();
         con.close();
@@ -113,7 +118,7 @@ public class GamerController {
                 "VALUES ("
                 + "'" + gameId.getText() + "', "
                 + "'" + gameTitle.getText() + "')";
-        System.out.println(query);
+        out.println(query);
         statement.executeQuery(query);
         statement.close();
         con.close();
@@ -132,7 +137,7 @@ public class GamerController {
                 + "'" + playerId.getText() + "', "
                 + "'" + playingDate.getValue() + "', "
                 + "'" + score.getText() + "')";
-        System.out.println(query);
+        out.println(query);
         statement.executeQuery(query);
         statement.close();
         con.close();
@@ -151,10 +156,12 @@ public class GamerController {
         score.setText("");
     }
     public void displayAction() throws SQLException {
-        if(playerList.getSelectionModel().getSelectedItem()!=null){
+        String playerID = playerList.getSelectionModel().getSelectedItem();
+
+        if (playerId != null) {
             DriverManager.registerDriver(new OracleDriver());
             Connection con = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
-            String query = "SELECT * FROM PLAYER WHERE PLAYER_ID ="+playerList.getSelectionModel().getSelectedItem();
+            String query = "SELECT * FROM PLAYER WHERE PLAYER_ID ="+ playerID;
             PreparedStatement ps = con.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
             if(rs.next()) {
@@ -166,9 +173,56 @@ public class GamerController {
                 province.setText(rs.getString("PROVINCE"));
                 phoneNumber.setText(rs.getString("PHONE_NUMBER"));
             }
+            rs.close();
+            displayInPrompt(playerID, con);
             con.close();
         }
-        System.out.println(playerList.getSelectionModel().getSelectedItem());
+    }
+
+    public void displayInPrompt(String playerId, Connection con) throws SQLException {
+        String msgPrompt = "No info";
+        String[] playerFields = {"PLAYER_ID", "FIRST_NAME", "LAST_NAME", "ADDRESS", "POSTAL_CODE", "PROVINCE", "PHONE_NUMBER"};
+
+        String queryUser = "SELECT * FROM PLAYER WHERE PLAYER_ID = " + playerId;
+        PreparedStatement ps = con.prepareStatement(queryUser);
+        ResultSet rsUser = ps.executeQuery();
+
+        if (rsUser.next()) {
+            msgPrompt = "USER INFO\n";
+            msgPrompt += "=========\n";
+            msgPrompt += "\n";
+            for (int i = 0; i < playerFields.length; i++) {
+                msgPrompt += playerFields[i] + ": " + rsUser.getString(playerFields[i]) + "\n";
+            }
+            msgPrompt += "\n";
+        }
+        rsUser.close();
+        String queryGames = "SELECT " +
+                "PLAYERANDGAME.game_id, PLAYERANDGAME.score, GAME.game_title " +
+                "FROM " +
+                "PLAYERANDGAME " +
+                "INNER JOIN " +
+                "PLAYER " +
+                "ON PLAYERANDGAME.player_id = PLAYER.player_id " +
+                "INNER JOIN " +
+                "GAME " +
+                "ON PLAYERANDGAME.game_id = GAME.game_id " +
+                "WHERE PLAYER.player_id= " + playerId;
+
+        msgPrompt += "GAMES INFO\n";
+        msgPrompt += "=========\n";
+
+        ps = con.prepareStatement(queryGames);
+        ResultSet rsGames = ps.executeQuery();
+
+        while (rsGames.next()) {
+                msgPrompt += "GAME_ID: " + rsGames.getString("GAME_ID") +"\n";
+                msgPrompt += "GAME_TITLE: " + rsGames.getString("GAME_TITLE") +"\n";
+                msgPrompt += "SCORE: " + rsGames.getString("SCORE") +"\n";
+                msgPrompt += "\n";
+        }
+        rsGames.close();
+        output.setText(msgPrompt);
     }
 
     public void updatePlayerInfo() throws SQLException {
@@ -196,7 +250,7 @@ public class GamerController {
             if (changes.charAt(changes.length() - 1) == ','){
                 changes = changes.substring(0,changes.length() - 1);
             }
-            System.out.println("fue: \""+phoneNumber.getText()+"\"");
+            out.println("fue: \""+phoneNumber.getText()+"\"");
             String query = "UPDATE PLAYER SET "+ changes +" WHERE PLAYER_ID = "+
                     playerList.getSelectionModel().getSelectedItem();
             DriverManager.registerDriver(new OracleDriver());
@@ -206,4 +260,6 @@ public class GamerController {
             con.close();
         }
     }
+
+
 }
