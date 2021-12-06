@@ -13,11 +13,15 @@
   </columnConstraints>
   <rowConstraints>
     <RowConstraints maxHeight="366.592529296875" minHeight="10.0" prefHeight="346.1829528808594" vgrow="SOMETIMES" />
-      <RowConstraints maxHeight="259.0" minHeight="0.0" prefHeight="36.88665771484375" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="259.0" minHeight="0.0" prefHeight="68.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="435.0" minHeight="10.0" prefHeight="62.0" vgrow="SOMETIMES" />
       <RowConstraints maxHeight="435.0" minHeight="10.0" prefHeight="177.61334228515625" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <Button fx:id="display" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#displayAction" prefWidth="70.0" text="Display" translateX="30.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <Button fx:id="display" mnemonicParsing="false" onAction="#displayAction" prefHeight="25.0" prefWidth="212.0" text="Display" translateX="30.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets left="-10.0" />
+         </GridPane.margin></Button>
       <Label prefHeight="26.0" prefWidth="150.0" text="Id: " translateX="20.0" translateY="-90.0" />
       <Label text="First Name" translateX="20.0" translateY="-60.0" />
       <Label text="Last Name" translateX="20.0" translateY="-30.0" />
@@ -32,8 +36,8 @@
       <TextField fx:id="postalCode" translateY="30.0" GridPane.columnIndex="1" />
       <TextField fx:id="province" translateY="60.0" GridPane.columnIndex="1" />
       <TextField fx:id="phoneNumber" translateY="90.0" GridPane.columnIndex="1" />
-      <ComboBox fx:id="playerList" prefHeight="27.0" prefWidth="212.0" promptText="Select Player ID" translateX="10.0" GridPane.rowIndex="1" />
-      <TextArea fx:id="output" prefHeight="600.0" prefWidth="200.0" translateY="10.0" GridPane.columnSpan="4" GridPane.rowIndex="2" />
+      <ComboBox fx:id="playerList" prefHeight="27.0" prefWidth="212.0" promptText="Select Player ID" translateX="10.0" GridPane.rowIndex="2" />
+      <TextArea fx:id="output" prefHeight="600.0" prefWidth="200.0" translateY="10.0" GridPane.columnSpan="4" GridPane.rowIndex="3" />
       <Label fx:id="alert" textFill="#d30707" translateX="100.0" GridPane.columnIndex="3" />
       <Label prefHeight="26.0" prefWidth="150.0" text="Id: " translateX="20.0" translateY="-90.0" GridPane.columnIndex="2" />
       <Label text="Player Information" translateX="10.0" translateY="-130.0" />
@@ -45,8 +49,9 @@
       <TextField fx:id="gameTitle" translateY="-60.0" GridPane.columnIndex="3" />
       <TextField fx:id="score" GridPane.columnIndex="3" />
       <DatePicker fx:id="playingDate" translateY="-30.0" GridPane.columnIndex="3" />
-      <Button fx:id="create" mnemonicParsing="false" onAction="#createRegister" prefHeight="38.0" prefWidth="173.0" text="Create Register" translateX="140.0" translateY="165.0" GridPane.columnIndex="3" />
-      <Button fx:id="update" mnemonicParsing="false" text="Update Player" translateX="160.0" translateY="130.0" GridPane.columnIndex="1" />
+      <Button fx:id="create" mnemonicParsing="false" onAction="#createRegister" prefHeight="38.0" prefWidth="173.0" text="Create Player and Game" translateX="140.0" translateY="165.0" GridPane.columnIndex="3" />
+      <Button fx:id="update" layoutX="39.0" layoutY="363.0" mnemonicParsing="false" onAction="#updatePlayerInfo" prefHeight="25.0" prefWidth="212.0" text="Update Player" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+      <Button fx:id="clearFields" mnemonicParsing="false" onAction="#clearFields" prefHeight="25.0" prefWidth="212.0" text="Clear Player Info" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
    </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
