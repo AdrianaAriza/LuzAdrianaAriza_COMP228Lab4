@@ -61,13 +61,21 @@ public class GamerController {
         loadPlayerList();
     }
 
+    public static final Alert alertUserExists = new Alert(Alert.AlertType.WARNING,"User already exists!\n We will only add the game");
+    public static final Alert registerCreated = new Alert(Alert.AlertType.INFORMATION,"New register created!\nFind your user in the Combo Box and press display");
+    public static final Alert userUpdated = new Alert(Alert.AlertType.INFORMATION,"User Updated!");
+    public static final String[] playerFields = {"PLAYER_ID", "FIRST_NAME", "LAST_NAME", "ADDRESS", "POSTAL_CODE", "PROVINCE", "PHONE_NUMBER"};
+
     public void createRegister() throws SQLException {
-        out.println("CREATING USER");
-        createPlayer();
+        Boolean userCreated = false;
+        userCreated = createPlayer();
         createGame();
         createPlayerAndGame();
         loadPlayerList();
         clearFields();
+        if (userCreated) {
+            registerCreated.show();
+        }
     }
 
     public void loadPlayerList() throws SQLException {
@@ -90,29 +98,58 @@ public class GamerController {
 
     }
 
-    public void createPlayer() throws SQLException {
+    public Boolean createPlayer() throws SQLException {
+        Integer userExist = 0;
+        Boolean userCreated = false;
+        try {
+            System.out.println("Create player");
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            Connection con = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
+            System.out.println("DB connected");
 
-        DriverManager.registerDriver(new OracleDriver());
-        Connection con = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
-        Statement statement = con.createStatement();
-        String query = "INSERT INTO PLAYER (player_id, first_name, last_name, phone_number, address, postal_code, province) " +
-                "VALUES ("
-                + "'" + playerId.getText() + "', "
-                + "'" + firstName.getText() + "', "
-                + "'" + lastName.getText() + "', "
-                + "'" + phoneNumber.getText() + "', "
-                + "'" + address.getText() + "', "
-                + "'" + postalCode.getText() + "', "
-                + "'" + province.getText() + "')";
-        out.println(query);
-        statement.executeQuery(query);
-        statement.close();
-        con.close();
+            Statement statement = con.createStatement();
+
+            String queryUserExist = "SELECT COUNT(*) AS \"USER_NUMBER\" FROM PLAYER WHERE PLAYER_ID =" + playerId.getText();
+            System.out.println(queryUserExist);
+
+            ResultSet rs = statement.executeQuery(queryUserExist);
+            while(rs.next()) {
+                String response = rs.getString("USER_NUMBER");
+                userExist = Integer.parseInt(response);
+            }
+
+            if (userExist == 0) {
+                userCreated = true;
+                String query = "INSERT INTO PLAYER (player_id, first_name, last_name, phone_number, address, postal_code, province) " +
+                        "VALUES ("
+                        + "'" + playerId.getText() + "', "
+                        + "'" + firstName.getText() + "', "
+                        + "'" + lastName.getText() + "', "
+                        + "'" + phoneNumber.getText() + "', "
+                        + "'" + address.getText() + "', "
+                        + "'" + postalCode.getText() + "', "
+                        + "'" + province.getText() + "')";
+                System.out.println(query);
+
+                statement.executeQuery(query);
+                System.out.println("Query executed");
+                statement.close();
+                con.close();
+            } else {
+                alertUserExists.show();
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return userCreated;
     }
     public void createGame() throws SQLException {
         DriverManager.registerDriver(new OracleDriver());
         Connection con = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
         Statement statement = con.createStatement();
+
+
 
         String query = "INSERT INTO GAME (game_id, game_title) " +
                 "VALUES ("
@@ -120,6 +157,7 @@ public class GamerController {
                 + "'" + gameTitle.getText() + "')";
         out.println(query);
         statement.executeQuery(query);
+        out.println("query create game executed");
         statement.close();
         con.close();
     }
@@ -127,6 +165,7 @@ public class GamerController {
         Random numRandom = new Random();
         int n = numRandom.nextInt(75-25+1) + 25;
         String playerGameId = Integer.toString(n);
+
         DriverManager.registerDriver(new OracleDriver());
         Connection con = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
         Statement statement = con.createStatement();
@@ -137,8 +176,10 @@ public class GamerController {
                 + "'" + playerId.getText() + "', "
                 + "'" + playingDate.getValue() + "', "
                 + "'" + score.getText() + "')";
-        out.println(query);
+        System.out.println(query);
+
         statement.executeQuery(query);
+
         statement.close();
         con.close();
     }
@@ -181,7 +222,6 @@ public class GamerController {
 
     public void displayInPrompt(String playerId, Connection con) throws SQLException {
         String msgPrompt = "No info";
-        String[] playerFields = {"PLAYER_ID", "FIRST_NAME", "LAST_NAME", "ADDRESS", "POSTAL_CODE", "PROVINCE", "PHONE_NUMBER"};
 
         String queryUser = "SELECT * FROM PLAYER WHERE PLAYER_ID = " + playerId;
         PreparedStatement ps = con.prepareStatement(queryUser);
@@ -256,6 +296,7 @@ public class GamerController {
             DriverManager.registerDriver(new OracleDriver());
             Connection con = DriverManager.getConnection(DBURL, DBUSER, DBPASS);
             PreparedStatement ps = con.prepareStatement(query);
+            userUpdated.show();
             ps.execute();
             con.close();
         }
